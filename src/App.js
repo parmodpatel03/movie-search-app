@@ -1,25 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import SearchBar from "./components/SearchBar";
+import MovieList from "./components/MovieList";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = () => {
+    const [movies, setMovies] = useState([]);
+    const API_KEY = process.env.REACT_APP_OMDB_API_KEY;
+
+    const fetchMovies = async (searchTerm) => {
+        try {
+            const response = await fetch(`http://www.omdbapi.com/?s=${searchTerm}&apikey=${API_KEY}`);
+            const data = await response.json();
+            if (data.Search) {
+                setMovies(data.Search);
+            } else {
+                setMovies([]);
+            }
+        } catch (error) {
+            console.error("Error fetching movies:", error);
+        }
+    };
+
+    return (
+        <div>
+            <h1>Movie Search App</h1>
+            <SearchBar onSearch={fetchMovies} />
+            <MovieList movies={movies} />
+        </div>
+    );
+};
 
 export default App;
